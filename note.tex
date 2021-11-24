@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{mathrsfs}
+\usepackage{harpoon}
+\usepackage{comment}
+%\usepackage{ctex}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{simplewick} 
+\usepackage{graphicx} % added for subfig
+\usepackage{subfigure} % added for subfig
+\title{Note for 2pt calculation with Chroma}
+\author{Zhipeng Xing and Jinchen He}
+\date{}
+\usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm]{geometry}
+\begin{document}
+\maketitle
+%\tableofcontents
+%\pagebreak[4]
+\section{Chroma Installation}
+
+\subsection{Download package}
+
+Download necessary packages for Installation from GitHub.
+
+\begin{itemize}
+    \item Use "git clone --recursive \dots", "recursive" means after the clone is created, initialize all submodules within, using their default settings.
+    \item If the connection to the GitHub is not stable on the server, you are suggested to clone on your local machine, then use "scp" to upload.
+\end{itemize}
+
+Package list:
+
+\begin{enumerate}
+    \item qmp
+    \item qio
+    \item qla
+    \item qdp
+    \item qopqdp
+    \item qdpxx
+\end{enumerate}
+
+\subsection{Configure and make}
+
+Configure and make in each folder of packages.
+
+\begin{itemize}
+    \item The whole process can be divided into 7 parts (6 packages above and chroma), so that you can locate the errors conveniently.
+    \item "export PATH=\dots:\$PATH", makes environment variables available to other programs called from bash. 
+    \item "autoreconf -vi": used to update generated configuration files, "-v" means verbosely reporting processing, "-i" means copying missing auxiliary files.
+    \item "./configure", you can use "./configure –help" to see the options
+    \item "./autogen.sh"
+\end{itemize}
+
+\section{Source code}
+
+\subsection{Plug in packages}
+
+Users are allowed to write some plug in packages and register in the Chroma, so that those packages can be used.
+
+\subsection{Make}
+
+\begin{itemize}
+    \item Makefile
+    \item make.sh 
+\end{itemize}
+
+\section{2pt calculation}
+
+\subsection{Perl script}
+
+Used to print the .xml file as the input for Chroma.
+
+\subsection{Inline 2pt.cc}
+
+
+\end{document}
