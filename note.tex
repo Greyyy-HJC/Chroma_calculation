@@ -70,7 +70,26 @@ Users are allowed to write some plug in packages and register in the Chroma, so 
 
 Used to print the .xml file as the input for Chroma.
 
+Write perl script as the structure in "xxx.h".
+
 \subsection{Inline 2pt.cc}
+
+
+
+
+\subsection{Add new plug in packages}
+
+If you want to use a new plug in package in the Chroma for calculation, you should:
+
+\begin{enumerate}
+    \item Write the .cc file and .h file.
+    \item Put two files above into the source code folder.
+    \item In the source code folder, add '\#include "inline\_xxx.h" ' and "foo \&= InlinexxxEnv::registerAll();" into "chroma.cc".
+    \item In the source code folder, add "inline\_2pt.h" and "inline\_2pt.o" into "Makefile".
+    \item "bash make.sh" again
+    \item Update your .pl file to use the new plug in package, and remake the soft link of "chroma" in the same path as .pl file.
+    \item "sbatch xxx.sh" again.
+\end{enumerate}
 
 
 \end{document}
