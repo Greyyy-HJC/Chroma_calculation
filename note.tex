@@ -9,8 +9,9 @@
 \usepackage{simplewick} 
 \usepackage{graphicx} % added for subfig
 \usepackage{subfigure} % added for subfig
+\usepackage{listings} % added for code block
 \title{Note for 2pt calculation with Chroma}
-\author{Zhipeng Xing and Jinchen He}
+\author{Jinchen He}
 \date{}
 \usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm]{geometry}
 \begin{document}
@@ -72,10 +73,54 @@ Used to print the .xml file as the input for Chroma.
 
 Write perl script as the structure in "xxx.h".
 
-\subsection{Inline 2pt.cc}
+\subsubsection{Sink smear}
+
+\begin{lstlisting}[language=Python]
+    print <<"EOF";
+    <elem>
+      <Name>SINK_SMEAR</Name>
+      <Frequency>1</Frequency>
+      <Param>
+        <version>5</version>
+        <Sink>
+          <version>1</version>
+          <SinkType>POINT_SINK</SinkType>
+          <j_decay>3</j_decay>
+        </Sink>
+      </Param>
+      <NamedObject>
+        <gauge_id>$gauge_id</gauge_id>
+        <prop_id>${prop_sum}</prop_id> 
+        <smeared_prop_id>prop_m${quark_mass}_p${quark_mom_x}${quark_mom_y}
+        ${quark_mom_z}.sum_sp</smeared_prop_id>
+      </NamedObject>
+    </elem>
+    EOF
+\end{lstlisting}
+
+This block read the propagator in $<prop\_id> </prop\_id>$, then use the method in $<SinkType> </SinkType>$, and output the smeared propagator as $<smeared\_prop\_id> </smeared\_prop\_id>$.
+
+
+\subsection{Inline xxx.cc}
 
 
 
+\subsection{Inline xxx.h}
+In perl script,
+
+\begin{lstlisting}[language=Python]
+    <s1_quark_props>
+    <elem>prop_m${c_mass}_p000.sum_sp</elem>
+  </s1_quark_props>
+\end{lstlisting}
+
+So, in the $inline\_xxx.h$,
+
+\begin{lstlisting}[language=Python]
+    multi1d<std::string> s1_quark_props; 
+\end{lstlisting}
+
+here just need to read the name of the variable, which is a string, because the $Sink smear$ block in perl script told Chroma to output a smeared propagator with name $xxx.sum\_up$, and here we just need to let Chroma know which variable should be used.
 
 \subsection{Add new plug in packages}
 
@@ -90,6 +135,23 @@ If you want to use a new plug in package in the Chroma for calculation, you shou
     \item Update your .pl file to use the new plug in package, and remake the soft link of "chroma" in the same path as .pl file.
     \item "sbatch xxx.sh" again.
 \end{enumerate}
+
+
+\subsection{Change to use different configurations}
+
+If you want to use other different configurations:
+
+\begin{enumerate}
+  \item In the perl script, change "cfg file" and "cfg type", which are configuration path and configuration type.
+  \item In the perl script, change "ns" and "nt", which are numbers of lattice on space axes and time axis.
+  \item In the perl script, change "mg layout".
+  \item In the perl script, change $<tseq>xx</tseq>$ in the EOF block.
+\end{enumerate}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{configuration_set.png} 	
+\end{figure} 
 
 
 \end{document}
