@@ -38,6 +38,7 @@ Package list:
     \item qdp
     \item qopqdp
     \item qdpxx
+    \item chroma
 \end{enumerate}
 
 \subsection{Configure and make}
@@ -45,11 +46,19 @@ Package list:
 Configure and make in each folder of packages.
 
 \begin{itemize}
-    \item The whole process can be divided into 7 parts (6 packages above and chroma), so that you can locate the errors conveniently.
+    \item The whole process can be divided into 7 parts, so that you can locate the errors conveniently.
     \item "export PATH=\dots:\$PATH", makes environment variables available to other programs called from bash. 
     \item "autoreconf -vi": used to update generated configuration files, "-v" means verbosely reporting processing, "-i" means copying missing auxiliary files.
     \item "./configure", you can use "./configure –help" to see the options
     \item "./autogen.sh"
+\end{itemize}
+
+\subsection{Double v.s. Single}
+
+\begin{itemize}
+  \item one place in the "make6.sh" (corresponding to qdpxx)
+  \item one place in the "make7.sh" (corresponding to chroma)
+  \item one place in the "Makefile" in chroma folder
 \end{itemize}
 
 \section{Source code}
@@ -60,10 +69,295 @@ Users are allowed to write some plug in packages and register in the Chroma, so 
 
 \subsection{Make}
 
+make sure load corret module (gcc)
+
 \begin{itemize}
     \item Makefile
     \item make.sh 
 \end{itemize}
+
+
+\subsection{a loop}
+
+\begin{lstlisting}[language=Python]
+for (int lnum = 0; lnum < params.named_obj.s1_quark_props.size(); ++lnum)
+\end{lstlisting}
+
+This loop is for propagator types, if "s1 quark props" only has one type input, no need to do the loop.
+
+\subsection{Point source v.s. Wall source}
+
+In the "make source" part of perl script, 
+
+\begin{enumerate}
+  \item $<grid>xxxx</grid>$ means the gaps of source, so wall source should take $<grid>1 1 1 96</grid>$.
+  \item $<wvf\_param>x</wvf\_param>$ means the sigma of gaussian blur, point source needs it.
+  \item $<wvfIntPar>x</wvfIntPar>$ means the iteration times of gaussian blur, point source needs it.
+\end{enumerate}
+
+Notice: wall source needs gauge fixing (and change to column gauge), but point source doesn't.
+
+\subsection{a block}
+
+\begin{lstlisting}[language=Python]
+for( $id = 0; $id < $n_src; $id = $id + 1 )
+{
+    if ($id ==0){$it=$it0;}
+    else{$it=$it+$t_nsrc;} 
+
+print <<"EOF";
+    <elem>
+      <Name>QPROPADD_cohen</Name>
+      <Frequency>1</Frequency>
+      <NamedObject>
+        <j_decay>3</j_decay>
+        <tA>$it $it</tA>
+        <factorA>0.0</factorA>
+        <propA>sh_source_dummy</propA>
+        <tB>$it $it</tB>
+        <factorB>1.0</factorB>
+        <propB>sh_source_ori</propB>
+        <propApB>shell_source_$id</propApB>
+      </NamedObject>
+    </elem>
+
+EOF
+\end{lstlisting}
+
+Explanation:
+Take parts of propagator and put them together.
+
+\subsection{gauge fix}
+
+\begin{lstlisting}[language=Python]
+  print <<"EOF";
+
+  <elem>
+      <!-- Coulomb gauge fix -->
+      <Name>COULOMB_GAUGEFIX</Name>
+      <Frequency>1</Frequency>
+      <Param>
+        <version>1</version>
+        <GFAccu>1.0e-6</GFAccu>
+        <GFMax>200</GFMax>
+        <OrDo>false</OrDo>
+        <OrPara>1.0</OrPara>
+        <j_decay>3</j_decay>
+      </Param>
+      <NamedObject>
+        <gauge_id>default_gauge_field</gauge_id>
+        <gfix_id>column_cfg</gfix_id>
+        <gauge_rot_id>gauge_rot</gauge_rot_id>
+      </NamedObject>
+    </elem>
+
+EOF
+$gauge_id="column_cfg";
+\end{lstlisting}
+
+\subsection{GPU v.s. CPU}
+
+The differences are in the making propagator part of perl script.
+
+For CPU:
+
+\begin{lstlisting}[language=Python]
+  print <<"EOF";
+  <elem>
+    <Name>PROPAGATOR</Name>
+    <Frequency>1</Frequency>
+    <Param>
+      <version>10</version>
+      <quarkSpinType>FULL</quarkSpinType>
+      <obsvP>true</obsvP>
+      <numRetries>1</numRetries>
+        <FermionAction>
+          <FermAct>UNPRECONDITIONED_CLOVER</FermAct>
+          <Mass>$quark_mass</Mass>
+          <clovCoeff>$clover</clovCoeff>
+          <FermionBC>
+            <FermBC>SIMPLE_FERMBC</FermBC>
+            <boundary>1 1 1 -1</boundary>
+          </FermionBC>
+        </FermionAction>
+        <InvertParam>
+          <invType>QOP_CLOVER_MULTIGRID_INVERTER</invType>
+          <Mass>$quark_mass</Mass>
+          <Clover>${clover}</Clover>
+          <MaxIter>50</MaxIter>
+          <Residual>3e-6</Residual>
+          <ExternalSubspace>true</ExternalSubspace>
+          <SubspaceId>cpu_multigrid_m$quark_mass</SubspaceId>
+          <RsdToleranceFactor>1.5</RsdToleranceFactor>
+          <Levels>2</Levels>
+          <Blocking>
+            <elem>${mg_layout}</elem>
+            <elem>2 2 2 1</elem>
+          </Blocking>
+          <NumNullVecs>24 36</NumNullVecs>
+          <NumExtraVecs>0 0</NumExtraVecs>
+          <NullResidual>0.4 0.4</NullResidual>
+          <NullMaxIter>100 100</NullMaxIter>
+          <NullConvergence>0.1 0.1</NullConvergence>
+          <Underrelax>1.0 1.0</Underrelax>
+          <NumPreHits>0 0</NumPreHits>
+          <NumPostHits>4 4</NumPostHits>
+          <CoarseMaxIter>12 12</CoarseMaxIter>
+          <CoarseResidual>0.1 0.1</CoarseResidual>
+        </InvertParam>
+    </Param>
+    <NamedObject>
+      <gauge_id>$gauge_id</gauge_id>
+      <source_id>shell_source_0</source_id>
+      <prop_id>prop_m${quark_mass}_p${quark_mom_x}${quark_mom_y}${quark_mom_z}.src0</prop_id>
+    </NamedObject>
+  </elem>
+
+EOF
+\end{lstlisting}
+
+
+For GPU:
+
+\begin{lstlisting}[language=Python]
+  print <<"EOF";
+  <elem>
+  <annotation>
+    propagator from the source at ()
+  </annotation>      
+    <Name>PROPAGATOR</Name>
+    <Frequency>1</Frequency>
+    <Param>
+      <version>10</version>
+      <quarkSpinType>FULL</quarkSpinType>
+      <obsvP>true</obsvP>
+      <numRetries>1</numRetries>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>$quark_mass</Mass>
+          <clovCoeff>$clover</clovCoeff>
+           <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>0.125</rho>
+            <n_smear>1</n_smear>
+            <orthog_dir>-1</orthog_dir>
+            <FermionBC>
+              <FermBC>SIMPLE_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+            </FermState>
+        </FermionAction>
+        <InvertParam>
+          <invType>QUDA_MULTIGRID_CLOVER_INVERTER_v2</invType>
+          <MULTIGRIDParams>
+           <RelaxationOmegaMG>1.0</RelaxationOmegaMG>
+           <RelaxationOmegaOuter>1.0</RelaxationOmegaOuter>
+           <CheckMultigridSetup>true</CheckMultigridSetup>
+            <Residual>1.0e-1</Residual>
+            <MaxIterations>12</MaxIterations>
+            <MaxCoarseIterations>1000</MaxCoarseIterations>
+            <CoarseResidual>0.1</CoarseResidual>                          
+            <Verbosity>true</Verbosity>
+            <Precision>SINGLE</Precision>
+            <Reconstruct>RECONS_12</Reconstruct>
+            <NullVectors>24</NullVectors>
+            <GenerateNullspace>true</GenerateNullspace>
+            <GenerateAllLevels>true</GenerateAllLevels>
+            <CheckMultigridSetup>true</CheckMultigridSetup>
+            <CycleType>MG_RECURSIVE</CycleType>
+            <Pre-SmootherApplications>0</Pre-SmootherApplications>
+            <Post-SmootherApplications>8</Post-SmootherApplications>
+            <SchwarzType>ADDITIVE_SCHWARZ</SchwarzType>
+            <Blocking>
+              <elem>$mg_layout</elem>
+            </Blocking>
+          </MULTIGRIDParams>
+          <SubspaceID>quda_mg_subspace</SubspaceID>
+          <ThresholdCount>500</ThresholdCount>
+          <MaxIter>1000</MaxIter>
+          <CloverParams>
+          <Mass>$quark_mass</Mass>
+          <clovCoeff>$clover</clovCoeff>
+          <AnisoParam>
+            <anisoP>false</anisoP>
+            <t_dir>3</t_dir>
+            <xi_0>1.0</xi_0>
+            <nu>1</nu>
+          </AnisoParam>
+            <FermionBC>
+              <FermBC>SIMPLE_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </CloverParams>
+          <RsdTarget>$Residual</RsdTarget>
+          <Delta>0.1</Delta>
+          <RsdToleranceFactor>100</RsdToleranceFactor>            
+          <AntiPeriodicT>true</AntiPeriodicT>
+          <SolverType>CG</SolverType>
+          <Verbose>true</Verbose>
+          <AsymmetricLinop>true</AsymmetricLinop>
+          <CudaReconstruct>RECONS_12</CudaReconstruct>
+          <CudaSloppyPrecision>SINGLE</CudaSloppyPrecision>
+          <CudaSloppyReconstruct>RECONS_12</CudaSloppyReconstruct>
+          <AutotuneDslash>true</AutotuneDslash>
+       </InvertParam>
+    </Param>
+    <NamedObject>
+      <gauge_id>$gauge_id</gauge_id>
+      <source_id>shell_source_$id</source_id>
+      <prop_id>prop_m${quark_mass}_p${quark_mom_x}${quark_mom_y}${quark_mom_z}.src$id</prop_id>
+    </NamedObject>
+  </elem>
+
+EOF
+
+## after make propagator, erase the useless sources
+print <<"EOF";
+  <elem>
+      <Name>ERASE_NAMED_OBJECT</Name>
+      <Frequency>1</Frequency>
+      <NamedObject>
+          <object_id>shell_source_$id</object_id>
+      </NamedObject>
+  </elem>
+
+EOF
+} # end loop $id
+
+print <<"EOF";
+  <elem>
+      <Name>ERASE_NAMED_OBJECT</Name>
+      <Frequency>1</Frequency>
+      <NamedObject>
+          <object_id>sh_source_ori</object_id>
+      </NamedObject>
+  </elem>
+
+  <elem>
+      <Name>ERASE_NAMED_OBJECT</Name>
+      <Frequency>1</Frequency>
+      <NamedObject>
+          <object_id>sh_source_dummy</object_id>
+      </NamedObject>
+  </elem>
+
+EOF
+\end{lstlisting}
+
+
+
+\section{Calculation process(in perl script)}
+\begin{enumerate}
+  \item Parameters input
+  \item HYP smearing \\
+    do smearing for configuration
+  \item Make source
+  \item Make propagator
+  \item Sink smearing \\
+    do smearing for sink point of the propagator
+  \item Contracting
+\end{enumerate}
+
 
 \section{2pt calculation}
 
@@ -72,6 +366,7 @@ Users are allowed to write some plug in packages and register in the Chroma, so 
 Used to print the .xml file as the input for Chroma.
 
 Write perl script as the structure in "xxx.h".
+
 
 \subsubsection{Sink smear}
 
@@ -146,6 +441,9 @@ If you want to use other different configurations:
   \item In the perl script, change "ns" and "nt", which are numbers of lattice on space axes and time axis.
   \item In the perl script, change "mg layout".
   \item In the perl script, change $<tseq>xx</tseq>$ in the EOF block.
+  \item In the perl script, change "clover".
+  \item In the perl and shell, change "quark mass".
+  \item In the shell, change the list of configurations. 
 \end{enumerate}
 
 \begin{figure}[h]
