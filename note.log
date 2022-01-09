@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.7.12)  7 JAN 2022 18:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.7.12)  7 JAN 2022 21:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -295,25 +295,25 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 {/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (/usr/local/texlive/2021/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2020/03/24 1.8d listings language file
 )
-LaTeX Font Info:    Trying to load font information for OML+cmr on input line 83.
+LaTeX Font Info:    Trying to load font information for OML+cmr on input line 84.
  (/usr/local/texlive/2021/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 83.
-LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 104.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 84.
+LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 105.
  (/usr/local/texlive/2021/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 104.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 105.
  [2] [3]
-Overfull \hbox (74.3088pt too wide) in paragraph at lines 212--213
+Overfull \hbox (74.3088pt too wide) in paragraph at lines 213--214
 [][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [4]
-Overfull \hbox (86.30893pt too wide) in paragraph at lines 308--309
+Overfull \hbox (86.30893pt too wide) in paragraph at lines 309--310
 [][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -321,7 +321,7 @@ Overfull \hbox (86.30893pt too wide) in paragraph at lines 308--309
 <configuration_set.png, id=31, 721.69624pt x 331.2375pt>
 File: configuration_set.png Graphic file (type png)
 <use configuration_set.png>
-Package pdftex.def Info: configuration_set.png  used on input line 451.
+Package pdftex.def Info: configuration_set.png  used on input line 452.
 (pdftex.def)             Requested size: 360.84724pt x 165.61833pt.
 
 
@@ -337,7 +337,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  68i,7n,74p,316b,1607s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb>
-Output written on note.pdf (8 pages, 218874 bytes).
+Output written on note.pdf (8 pages, 218889 bytes).
 PDF statistics:
  75 PDF objects out of 1000 (max. 8388607)
  52 compressed objects within 1 object stream
